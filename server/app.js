@@ -9,7 +9,14 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 const app = express();
 
 app.set('trust proxy', 1); // needed on Render/Railway etc. so rate-limit sees the real IP
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'img-src': ["'self'", 'data:', 'blob:'],
+    },
+  },
+}));
 if (process.env.CLIENT_URL) app.use(cors({ origin: process.env.CLIENT_URL })); // only if frontend is hosted separately
 app.use(express.json({ limit: '400kb' }));
 
